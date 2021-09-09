@@ -86,7 +86,7 @@ function main() {
       }
       else if (queryObject.type === 'follow') {
         postStatus("Teal Bot 现在好开心，因为被你 follow 啦！ :blobcatrainbow: \n\
-        发布一则内容为 @teal #thelp 的嘟文来查看我的技能！", false)
+发布一则内容为 @teal #thelp 的嘟文来查看我的技能！", false)
       }
     }
     currentQueryId = queryId
@@ -199,7 +199,7 @@ function hasCommand(commandName) {
 
 async function postStatus(message, doReply) {
   const content = "@" + queryUsername + " " + message
-  const options = {
+  const postStatusOptions = {
     method: 'POST',
     url: 'https://erica.moe/api/v1/statuses',
     headers: {
@@ -208,10 +208,10 @@ async function postStatus(message, doReply) {
     },
     formData: {
       status: content,
-      in_reply_to_id: doReply ? queryStatusId : undefined
+      in_reply_to_id: doReply ? queryStatusId : ''
     }
   }
-  request(options, function (error, _response, body) {
+  request(postStatusOptions, function (error, _response, body) {
     if (error) throw new Error(error);
     console.log(body);
   });

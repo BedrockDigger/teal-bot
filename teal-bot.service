@@ -1,0 +1,9 @@
+[Unit]
+Description=Start Teal Bot on boot.
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/node /home/mastodon/teal-bot/index.js
+
+[Install]
+WantedBy=multi-user.target

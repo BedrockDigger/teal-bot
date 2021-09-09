@@ -1,0 +1,28 @@
+{
+  "name": "teal-bot",
+  "version": "1.0.0",
+  "description": "A bot traveling from #4DB6AC to #E0F2F1.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BedrockDigger/teal-bot.git"
+  },
+  "keywords": [
+    "mastodon"
+  ],
+  "author": "BedrockDigger",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/BedrockDigger/teal-bot/issues"
+  },
+  "homepage": "https://github.com/BedrockDigger/teal-bot#readme",
+  "dependencies": {
+    "dotenv": "^10.0.0",
+    "md5": "^2.3.0",
+    "node-html-parser": "^4.1.4",
+    "request": "^2.88.2"
+  }
+}

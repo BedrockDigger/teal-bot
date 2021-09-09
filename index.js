@@ -178,7 +178,7 @@ async function commandHelp() {
 #tchat: 和我一起快乐聊天（目前使用青云客的菲菲人工智障）\n\
 #ttrans: 翻译指定嘟文（目前使用百度翻译）\n\
 \n\
-关于每个技能的详细用法，请参考'
+关于每个技能的详细用法，请参考 https://github.com/BedrockDigger/teal-bot/blob/master/README.md'
 
   postStatus(message, true)
 }

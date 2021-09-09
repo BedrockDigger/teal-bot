@@ -81,7 +81,7 @@ function main() {
           commandChat()
         }
         else {
-          postStatus("这个命令 @e 没教过我，怪他咯～ :blobmiou:", true)
+          postStatus("这个命令 @estel_de_hikari 没教过我，怪他咯～ :blobmiou:", true)
         }
       }
       else if (queryObject.type === 'follow') {

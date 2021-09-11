@@ -1,9 +1,11 @@
 const HTMLParser = require('node-html-parser');
-const superagent = require('superagent');
+const agent = require('superagent-use')(require('superagent'));
+const prefix = require('superagent-prefix');
 const md5 = require('md5');
 require('dotenv').config()
 
 // env vars
+agent.use(prefix(process.env.MASTODON_DOMAIN));
 const token = process.env.MASTODON_ACCESS_TOKEN
 const appid = process.env.BAIDU_TRANSLATE_APPID
 const key = process.env.BAIDU_TRANSLATE_KEY
@@ -32,8 +34,8 @@ const languages = [
   'hu', 'cht', 'vie'
 ]
 
-function main() {
-  superagent.get('https://erica.moe/api/v1/notifications')
+function mainLoop() {
+  agent.get('/api/v1/notifications')
     .set('Authorization', token)
     .set('Content-Type', 'multipart/form-data')
     .field('limit', '1')
@@ -61,6 +63,9 @@ function main() {
             if (querylanguageArray.length > 1) {
               postStatus("我比较傻，一次只能翻译成一种语言 :blobmiou:", true, false)
             }
+            else if (!queryObject.status.in_reply_to_id) {
+              postStatus("翻译啥？你得回复个要翻译的嘟文呀。", true, false)
+            }
             else {
               queryReplyStatusId = queryObject.status.in_reply_to_id
               commandTranslate(querylanguageArray[0])
@@ -77,7 +82,7 @@ function main() {
       }
       currentQueryId = queryId
     })
-  setTimeout(main, 5000);
+  setTimeout(mainLoop, 5000);
 }
 
 // command functions
@@ -88,27 +93,27 @@ async function commandEcho() {
 }
 
 async function commandChat() {
-  superagent.get('http://api.qingyunke.com/api.php')
+  agent.get('http://api.qingyunke.com/api.php')
     .query({
       key: 'free',
       appid: '0',
       msg: queryStatusContent
     })
     .then((res) => {
-      const answer = JSON.parse(res.text).content
+      const answer = JSON.parse(res.text).content.replace("菲菲", "Teal Bot")
       postStatus(answer, true, false)
     })
 }
 
 async function commandTranslate(lang) {
   let originalText = ""
-  const sourceBody = JSON.parse((await superagent.get('https://erica.moe/api/v1/statuses/' + queryReplyStatusId)
+  const sourceBody = JSON.parse((await agent.get('/api/v1/statuses/' + queryReplyStatusId)
     .set('Authorization', token)).text)
   console.log("-----getStatus-----\n" + JSON.stringify(sourceBody) + "\n");
   originalText = stripContent(sourceBody.content, true)
   const randNum = getRandomInt(1, 99999);
   const sign = md5(appid + originalText + randNum + key);
-  const translatedBody = JSON.parse((await superagent.get('https://fanyi-api.baidu.com/api/trans/vip/translate')
+  const translatedBody = JSON.parse((await agent.get('https://fanyi-api.baidu.com/api/trans/vip/translate')
     .query({
       q: originalText,
       from: 'auto',
@@ -124,9 +129,12 @@ async function commandTranslate(lang) {
   }
   else {
     const targetString = translatedBody.trans_result[0].dst
+    const sliceSum = Math.ceil(targetString.length / 450)
+    let sliceCount = 1
     await postStatus('百度翻译说，上面那段话的意思是：\n', true, false)
-    for (let i = 0; i < targetString.length; i += 480) {
-      await postStatus(targetString.substring(i, i + 480), false, true)
+    for (let i = 0; i < targetString.length; i += 450) {
+      await postStatus(targetString.substring(i, i + 450) + ` (${sliceCount}/${sliceSum})`, false, true)
+      sliceCount++
     }
   }
 }
@@ -145,7 +153,7 @@ async function commandHelp() {
 \n\
 #thelp: 显示本则帮助\n\
 #techo: 回显你发给我的嘟文\n\
-#tchat: 这个技能使用时不用加技能标签，使用时和我一起快乐聊天（目前使用青云客的菲菲人工智障）\n\
+聊天: 这个技能使用时不用加技能标签，使用时和我一起快乐聊天（目前使用青云客的菲菲人工智障）\n\
 #ttrans: 翻译指定嘟文（目前使用百度翻译），嘟文的主人如果锁嘟需要接受 Teal Bot 的关注才能翻译\n\
 \n\
 关于每个技能的详细用法，请参考 https://github.com/BedrockDigger/teal-bot/blob/master/README.md'
@@ -169,7 +177,7 @@ function hasCommand(commandName) {
 
 async function postStatus(message, doReply, doReplySelf) {
   const content = "@" + queryUsername + " " + message
-  await superagent.post('https://erica.moe/api/v1/statuses')
+  await agent.post('/api/v1/statuses')
     .set('Authorization', token)
     .set('Content-Type', 'multipart/form-data')
     .field('status', content)
@@ -187,4 +195,4 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (realMax - realMin) + realMin);
 }
 
-setTimeout(main, 100)
+setTimeout(mainLoop, 100)

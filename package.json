@@ -23,6 +23,8 @@
     "dotenv": "^10.0.0",
     "md5": "^2.3.0",
     "node-html-parser": "^4.1.4",
-    "superagent": "^6.1.0"
+    "superagent": "^6.1.0",
+    "superagent-prefix": "^0.0.2",
+    "superagent-use": "^0.1.0"
   }
 }

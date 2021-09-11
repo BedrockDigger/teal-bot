@@ -3,7 +3,9 @@ Description=Start Teal Bot on boot.
 
 [Service]
 Type=simple
+Restart=always
 ExecStart=/usr/bin/node /home/mastodon/teal-bot/index.js
+EnvironmentFile=/home/mastodon/teal-bot/.env
 
 [Install]
 WantedBy=multi-user.target

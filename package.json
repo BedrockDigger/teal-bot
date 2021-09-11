@@ -23,6 +23,6 @@
     "dotenv": "^10.0.0",
     "md5": "^2.3.0",
     "node-html-parser": "^4.1.4",
-    "request": "^2.88.2"
+    "superagent": "^6.1.0"
   }
 }

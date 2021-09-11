@@ -135,7 +135,6 @@ async function commandHelp() {
   const message =
     '我是 @estel_de_hikari 的还在开发中的的目前不知道作用是什么的机器人。\n\
 \n\
-:blobcatglowsticks: :blobcatglowsticks: :blobcatglowsticks: :blobcatglowsticks: :blobcatglowsticks: \
 :blobcatglowsticks: :blobcatglowsticks: :blobcatglowsticks: :blobcatglowsticks: :blobcatglowsticks: \n\
 \n\
 用法：\n\

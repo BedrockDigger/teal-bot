@@ -82,6 +82,7 @@ function mainLoop() {
       }
       currentQueryId = queryId
     })
+    .catch((err) => console.error(err))
   setTimeout(mainLoop, 5000);
 }
 
@@ -103,12 +104,14 @@ async function commandChat() {
       const answer = JSON.parse(res.text).content.replace("菲菲", "Teal Bot")
       postStatus(answer, true, false)
     })
+    .catch((err) => console.error(err))
 }
 
 async function commandTranslate(lang) {
   let originalText = ""
   const sourceBody = JSON.parse((await agent.get('/api/v1/statuses/' + queryReplyStatusId)
-    .set('Authorization', token)).text)
+    .set('Authorization', token)
+    .catch((err) => console.error(err))).text)
   console.log("-----getStatus-----\n" + JSON.stringify(sourceBody) + "\n");
   originalText = stripContent(sourceBody.content, true)
   const randNum = getRandomInt(1, 99999);
@@ -121,7 +124,7 @@ async function commandTranslate(lang) {
       appid: appid,
       salt: randNum,
       sign: sign
-    })).text)
+    }).catch((err) => console.error(err))).text)
   console.log(translatedBody)
   if (translatedBody.error_code) {
     const errorReport = "百度翻译 API 报错啦。以下是错误信息：\n" + translatedBody.toString()
@@ -187,6 +190,7 @@ async function postStatus(message, doReply, doReplySelf) {
       console.log(selfStatusId)
       console.log("-----postStatus-----\n" + res.text + "\n");
     })
+    .catch((err) => console.error(err))
 }
 
 function getRandomInt(min, max) {

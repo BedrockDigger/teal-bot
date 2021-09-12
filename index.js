@@ -111,7 +111,7 @@ async function commandTranslate(lang) {
   let originalText = ""
   const sourceBody = JSON.parse((await agent.get('/api/v1/statuses/' + queryReplyStatusId)
     .set('Authorization', token)
-    .catch((err) => console.error('loc3' + err)))).text)
+    .catch((err) => console.error('loc3' + err))).text)
   console.log("-----getStatus-----\n" + JSON.stringify(sourceBody) + "\n");
   originalText = stripContent(sourceBody.content, true)
   const randNum = getRandomInt(1, 99999);

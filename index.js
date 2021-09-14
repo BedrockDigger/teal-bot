@@ -22,7 +22,7 @@ let queryTagsArray = [] // mandatory, but can be empty
 let queryCommandsArray = []
 
 // commands except tchat
-const commands = ['thelp', 'techo', 'ttrans']
+const commands = ['thelp', 'techo', 'ttrans', 'tnews']
 
 // translate target language abbrs
 const languages = [
@@ -57,6 +57,9 @@ function mainLoop() {
           }
           else if (hasCommand('thelp')) {
             commandHelp()
+          }
+          else if (hasCommand('tnews')) {
+            commandNews()
           }
           else if (hasCommand('ttrans')) {
             const querylanguageArray = queryTagsArray.filter(x => languages.includes(x));
@@ -103,8 +106,21 @@ async function commandChat() {
     .then((res) => {
       const answer = JSON.parse(res.text).content.replace("菲菲", "Teal Bot")
       postStatus(answer, true, false)
+      console.log("\n\nHit qyk\n\n")
     })
     .catch((err) => console.error('loc2' + err))
+}
+
+async function commandNews() {
+  const response = JSON.parse((await agent.get('https://36kr.com/api/newsflash')).text)
+  const newsItems = response.data.items
+  let sliceCount = 1
+  await postStatus('以下新闻由36Kr快讯提供。\nhttps://www.36kr.com/newsflashes', true, false)
+  for (let i = 0; i < 5; i++) {
+    const item = newsItems[i]
+    await postStatus(`${item.title}\n${item.published_at}\n\n${item.description}` + ` (${sliceCount}/5)`, false, true)
+    sliceCount++
+  }
 }
 
 async function commandTranslate(lang) {

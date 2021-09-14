@@ -82,6 +82,7 @@ function mainLoop() {
             commandShit()
           }
           else {
+            queryReplyStatusId = queryObject.status.in_reply_to_id
             commandChat()
           }
         }
@@ -118,7 +119,7 @@ async function commandChat() {
     },
   };
   const client = new NlpClient(clientConfig);
-  const params = { Query: queryStatusContent };
+  const params = { Query: queryStatusContent ? queryStatusContent : await getQueryReplyStatus() };
   client.ChatBot(params).then(
     (data) => {
       postStatus(data.Reply, true, false)
@@ -142,12 +143,7 @@ async function commandNews() {
 }
 
 async function commandTranslate(lang) {
-  let originalText = ""
-  const sourceBody = JSON.parse((await agent.get('/api/v1/statuses/' + queryReplyStatusId)
-    .set('Authorization', mastodonToken)
-    .catch((err) => console.error('loc3' + err))).text)
-  console.log("-----getStatus-----\n" + JSON.stringify(sourceBody) + "\n");
-  originalText = stripContent(sourceBody.content, true)
+  const originalText = queryStatusContent ? queryStatusContent : await getQueryReplyStatus()
   const randNum = getRandomInt(1, 99999);
   const sign = md5(baiduTranslateAppid + originalText + randNum + baiduTranslateKey);
   const translatedBody = JSON.parse((await agent.get('https://fanyi-api.baidu.com/api/trans/vip/translate')
@@ -159,7 +155,6 @@ async function commandTranslate(lang) {
       salt: randNum,
       sign: sign
     }).catch((err) => console.error('loc4' + err))).text)
-  console.log(translatedBody)
   if (translatedBody.error_code) {
     const errorReport = "百度翻译 API 报错啦。以下是错误信息：\n" + translatedBody.toString()
     postStatus(errorReport, true, false)
@@ -179,10 +174,9 @@ async function commandShit() {
 
 async function postSlicedStatus(message, doReply, doReplySelf) {
   const sliceSum = Math.ceil(message.length / 450)
-  // let sliceCount = 1
   for (let i = 0; i < message.length; i += 450) {
-    await postStatus(message.substring(i, i + 450) + ` (${Math.floor(i / 450) + 1}/${sliceSum})`, doReply, doReplySelf)
-    // sliceCount++
+    await postStatus(message.substring(i, i + 450) +
+      ` (${Math.floor(i / 450) + 1}/${sliceSum})`, doReply, doReplySelf)
   }
 }
 
@@ -213,7 +207,7 @@ async function commandHelp() {
 function stripContent(rawContent, keepTextOnly) {
   const root = HTMLParser.parse(rawContent);
   const mentionAndTagRegex = /([@#][\w_-]+)/g
-  const result = keepTextOnly ? root.textContent.replace(mentionAndTagRegex, "").trimStart()
+  const result = keepTextOnly ? root.textContent.replace(mentionAndTagRegex, "").trim()
     : root.textContent
   return result
 }
@@ -231,10 +225,18 @@ async function postStatus(message, doReply, doReplySelf) {
     .field('in_reply_to_id', doReply ? queryStatusId : doReplySelf ? selfStatusId : '')
     .then((res) => {
       selfStatusId = JSON.parse(res.text).id
-      console.log(selfStatusId)
       console.log("-----postStatus-----\n" + res.text + "\n");
     })
     .catch((err) => console.error('loc5' + err))
+}
+
+async function getQueryReplyStatus() {
+  const sourceBody = JSON.parse((await agent.get('/api/v1/statuses/' + queryReplyStatusId)
+    .set('Authorization', mastodonToken)
+    .catch((err) => console.error('loc3' + err))).text)
+  console.log("-----getStatus-----\n" + JSON.stringify(sourceBody) + "\n");
+  const content = stripContent(sourceBody.content, true)
+  return content
 }
 
 function getRandomInt(min, max) {

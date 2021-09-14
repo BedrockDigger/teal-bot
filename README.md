@@ -26,7 +26,7 @@ Teal Bot 的大多数技能都可以通过发布一则格式如下的嘟文来�
 
 ### 聊天
 
-和 Teal Bot 一起快乐聊天。~~目前使用青云客的[菲菲](https://api.qingyunke.com/)聊天机器人。为什么？因为不要钱。~~目前使用腾讯云 NLP 闲聊 API。`tencentcloud-sdk-nodejs` SDK 真的是好东西，手搓 request 的难受谁知道（
+和 Teal Bot 一起快乐聊天。 ~~目前使用青云客的[菲菲](https://api.qingyunke.com/)聊天机器人。为什么？因为不要钱。~~ 目前使用腾讯云 NLP 闲聊 API。`tencentcloud-sdk-nodejs` SDK 真的是好东西，手搓 request 的难受谁知道（
 
 **使用示例**
 

@@ -121,7 +121,7 @@ async function commandChat() {
   const params = { Query: queryStatusContent };
   client.ChatBot(params).then(
     (data) => {
-      postStatus(data.Reply)
+      postStatus(data.Reply, true, false)
     },
     (err) => {
       console.error('loc2' + err)

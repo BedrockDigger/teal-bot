@@ -27,7 +27,7 @@
     "superagent": "^6.1.0",
     "superagent-prefix": "^0.0.2",
     "superagent-use": "^0.1.0",
-    "tencentcloud-sdk-nodejs": "^4.0.201"
+    "tencentcloud-sdk-nodejs": "^4.0.3"
   },
   "devDependencies": {
     "prettier": "^2.4.0"

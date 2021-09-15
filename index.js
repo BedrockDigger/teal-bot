@@ -1,7 +1,6 @@
 const HTMLParser = require("node-html-parser");
 const agent = require("superagent-use")(require("superagent"));
 const prefix = require("superagent-prefix");
-const md5 = require("md5");
 require("dotenv").config();
 const tencentcloud = require("tencentcloud-sdk-nodejs");
 const bullshitGenerator = require("./bullshitGenerator");
@@ -162,36 +161,31 @@ async function commandTranslate(lang) {
   const originalText = queryStatusContent
     ? queryStatusContent
     : await getQueryReplyStatus();
-  const randNum = getRandomInt(1, 99999);
-  const sign = md5(
-    baiduTranslateAppid + originalText + randNum + baiduTranslateKey
-  );
-  const translatedBody = JSON.parse(
-    (
-      await agent
-        .get("https://fanyi-api.baidu.com/api/trans/vip/translate")
-        .query({
-          q: originalText,
-          from: "auto",
-          to: lang ? lang : "zh",
-          appid: baiduTranslateAppid,
-          salt: randNum,
-          sign: sign,
-        })
-        .catch((err) =>
-          console.error("commandTranslate() failed with error: " + err)
-        )
-    ).text
-  );
-  if (translatedBody.error_code) {
-    const errorReport =
-      "百度翻译 API 报错啦。以下是错误信息：\n" + translatedBody.toString();
-    postStatus(errorReport, true, false);
-  } else {
-    const targetString = translatedBody.trans_result[0].dst;
-    await postStatus("百度翻译说，上面那段话的意思是：\n", true, false);
-    await postSlicedStatus(targetString, false, true);
-  }
+  const TmtClient = tencentcloud.tmt.v20180321.Client;
+  const clientConfig = {
+    credential: {
+      secretId: tencentChatbotSecretId,
+      secretKey: tencentChatbotSecretKey,
+    },
+    region: "ap-hongkong",
+    profile: {
+      httpProfile: {
+        endpoint: "tmt.tencentcloudapi.com",
+      },
+    },
+  };
+  const client = new TmtClient(clientConfig);
+  const params = {
+    SourceText: originalText,
+    Source: "auto",
+    Target: lang ? lang : "zh",
+    ProjectId: 0,
+  };
+  const translatedObject = await client.TextTranslate(params)
+  console.log(translatedObject)
+  const targetString = translatedObject.TargetText;
+  await postStatus("腾讯云机器翻译说，上面那段话的意思是：\n", true, false);
+  await postSlicedStatus(targetString, false, true);
 }
 
 async function commandShit() {
@@ -233,7 +227,7 @@ async function postSlicedStatus(message, doReply, doReplySelf) {
   for (let i = 0; i < message.length; i += 450) {
     await postStatus(
       message.substring(i, i + 450) +
-      ` (${Math.floor(i / 450) + 1}/${sliceSum})`,
+        ` (${Math.floor(i / 450) + 1}/${sliceSum})`,
       doReply,
       doReplySelf
     );

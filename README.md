@@ -20,6 +20,8 @@ Teal Bot 的大多数技能都可以通过发布一则格式如下的嘟文来�
 
 `#ttrans`: 翻译指定嘟文（目前使用百度翻译）
 
+`#tshit`：众所周知的狗屁不通生成器。
+
 快乐聊天功能为了自然的体验不需要技能标签。（目前使用青云客的菲菲人工智障）
 
 它们各自的详细用法如下。
@@ -143,4 +145,29 @@ Teal Bot 的大多数技能都可以通过发布一则格式如下的嘟文来�
 
 ## 部署
 
-// TODO
+1. 克隆源码。依据源码的绝对路径更改 teal-bot.service。
+
+2. 复制 systemd unit file。
+
+   ```bash
+   $ sudo cp teal-bot.service /etc/systemd/system/
+   ```
+
+3. 填写 .env 里的环境变量，详情见 .env.example 中的注释。
+
+   ```bash
+   $ cp .env.example .env
+   $ vim .env
+   ```
+
+4. 安装依赖。
+
+   ```bash\
+   $ npm i
+   ```
+
+5. Enable systemd unit 来开机自启。可选 `--now` 同时开始执行。
+
+   ```bash
+   $ sudo systemctl enable --now teal-bot.service
+   ```

@@ -26,7 +26,7 @@ let queryTagsArray = []; // mandatory, but can be empty
 let queryCommandsArray = [];
 
 // commands except tchat
-const commands = ["thelp", "techo", "ttrans", "tnews", "tshit"];
+const commands = ["thelp", "techo", "ttrans", "tshit"];
 
 // translate target language abbrs
 const languages = [
@@ -86,8 +86,6 @@ function mainLoop() {
             commandEcho();
           } else if (hasCommand("thelp")) {
             commandHelp();
-          } else if (hasCommand("tnews")) {
-            commandNews();
           } else if (hasCommand("ttrans")) {
             const querylanguageArray = queryTagsArray.filter((x) =>
               languages.includes(x)
@@ -162,29 +160,6 @@ async function commandChat() {
   );
 }
 
-async function commandNews() {
-  const response = JSON.parse(
-    (await agent.get("https://36kr.com/api/newsflash")).text
-  );
-  const newsItems = response.data.items;
-  let sliceCount = 1;
-  await postStatus(
-    "以下新闻由36Kr快讯提供。\nhttps://www.36kr.com/newsflashes",
-    true,
-    false
-  );
-  for (let i = 0; i < 5; i++) {
-    const item = newsItems[i];
-    await postStatus(
-      `${item.title}\n${item.published_at}\n\n${item.description}` +
-        ` (${sliceCount}/5)`,
-      false,
-      true
-    );
-    sliceCount++;
-  }
-}
-
 async function commandTranslate(lang) {
   const originalText = queryStatusContent
     ? queryStatusContent
@@ -239,23 +214,9 @@ async function postSlicedStatus(message, doReply, doReplySelf) {
 
 async function commandHelp() {
   const message =
-    "我是 @estel_de_hikari 的还在开发中的的目前不知道作用是什么的机器人。\n\
-\n\
-:blobcatglowsticks: :blobcatglowsticks: :blobcatglowsticks: :blobcatglowsticks: :blobcatglowsticks: \n\
-\n\
-用法：\n\
-我的所有技能都可以通过发布一则格式如下的嘟文来召唤：\n\
-@teal #技能 内容\n\
-为了不污染标签环境，所有技能的名字都有个额外的字母“t”作开头。\n\
-其中 #技能 目前可以是：\n\
-\n\
-#thelp: 显示本则帮助\n\
-#techo: 回显你发给我的嘟文\n\
-聊天: 这个技能使用时不用加技能标签，使用时和我一起快乐聊天（目前使用青云客的菲菲人工智障）\n\
-#ttrans: 翻译指定嘟文（目前使用百度翻译），嘟文的主人如果锁嘟需要接受 Teal Bot 的关注才能翻译\n\
-\n\
-关于每个技能的详细用法，请参考 https://github.com/BedrockDigger/teal-bot/blob/master/README.md";
-
+    "我是 @estel_de_hikari 写的 bot。我的名字来自他喜欢的一个颜色。我可以当复读机、会在28种语言之间进行互译，还会陪你聊天。\
+你可以在 https://github.com/BedrockDigger/teal-bot/blob/master/README.md 了解和我愉快玩耍的具体方法。\n\
+我在不过300行的 JavaScript 里，等你回家哦。 :blobcat:";
   postStatus(message, true, false);
 }
 

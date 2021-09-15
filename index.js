@@ -77,8 +77,8 @@ function mainLoop() {
           queryTagsArray = queryObject.status.tags.map(
             (tagObject) => tagObject.name
           );
-          queryCommandsArray = queryTagsArray.filter((x) =>
-            commands.includes(x)
+          queryCommandsArray = queryTagsArray.filter((command) =>
+            commands.includes(command)
           );
           if (queryCommandsArray.length > 1) {
             postStatus("我比较傻，只能听懂一个命令 :blobmiou:", true, false);
@@ -87,8 +87,8 @@ function mainLoop() {
           } else if (hasCommand("thelp")) {
             commandHelp();
           } else if (hasCommand("ttrans")) {
-            const querylanguageArray = queryTagsArray.filter((x) =>
-              languages.includes(x)
+            const querylanguageArray = queryTagsArray.filter((language) =>
+              languages.includes(language)
             );
             if (querylanguageArray.length > 1) {
               postStatus(
@@ -96,8 +96,6 @@ function mainLoop() {
                 true,
                 false
               );
-            } else if (!queryObject.status.in_reply_to_id) {
-              postStatus("翻译啥？你得回复个要翻译的嘟文呀。", true, false);
             } else {
               queryReplyStatusId = queryObject.status.in_reply_to_id;
               commandTranslate(querylanguageArray[0]);
@@ -119,7 +117,7 @@ function mainLoop() {
       }
       currentQueryId = queryId;
     })
-    .catch((err) => console.error("loc1" + err));
+    .catch((err) => console.error("mainLoop() failed with error: " + err));
   setTimeout(mainLoop, 2000);
 }
 
@@ -155,7 +153,7 @@ async function commandChat() {
       postStatus(data.Reply, true, false);
     },
     (err) => {
-      console.error("loc2" + err);
+      console.error("commandChat() failed with error: " + err);
     }
   );
 }
@@ -180,7 +178,9 @@ async function commandTranslate(lang) {
           salt: randNum,
           sign: sign,
         })
-        .catch((err) => console.error("loc4" + err))
+        .catch((err) =>
+          console.error("commandTranslate() failed with error: " + err)
+        )
     ).text
   );
   if (translatedBody.error_code) {
@@ -200,18 +200,6 @@ async function commandShit() {
   await postSlicedStatus(bullshit, false, true);
 }
 
-async function postSlicedStatus(message, doReply, doReplySelf) {
-  const sliceSum = Math.ceil(message.length / 450);
-  for (let i = 0; i < message.length; i += 450) {
-    await postStatus(
-      message.substring(i, i + 450) +
-        ` (${Math.floor(i / 450) + 1}/${sliceSum})`,
-      doReply,
-      doReplySelf
-    );
-  }
-}
-
 async function commandHelp() {
   const message =
     "我是 @estel_de_hikari 写的 bot。我的名字来自他喜欢的一个颜色。我可以当复读机、会在28种语言之间进行互译，还会陪你聊天。\
@@ -221,19 +209,6 @@ async function commandHelp() {
 }
 
 // utility functions
-
-function stripContent(rawContent, keepTextOnly) {
-  const root = HTMLParser.parse(rawContent);
-  const mentionAndTagRegex = /([@#][\w_-]+)/g;
-  const result = keepTextOnly
-    ? root.textContent.replace(mentionAndTagRegex, "").trim()
-    : root.textContent;
-  return result;
-}
-
-function hasCommand(commandName) {
-  return queryCommandsArray.indexOf(commandName) > -1;
-}
 
 async function postStatus(message, doReply, doReplySelf) {
   const content = "@" + queryUsername + " " + message;
@@ -250,7 +225,32 @@ async function postStatus(message, doReply, doReplySelf) {
       selfStatusId = JSON.parse(res.text).id;
       console.log("-----postStatus-----\n" + res.text + "\n");
     })
-    .catch((err) => console.error("loc5" + err));
+    .catch((err) => console.error("postStatus() failed with error: " + err));
+}
+
+async function postSlicedStatus(message, doReply, doReplySelf) {
+  const sliceSum = Math.ceil(message.length / 450);
+  for (let i = 0; i < message.length; i += 450) {
+    await postStatus(
+      message.substring(i, i + 450) +
+        ` (${Math.floor(i / 450) + 1}/${sliceSum})`,
+      doReply,
+      doReplySelf
+    );
+  }
+}
+
+function stripContent(rawContent, keepTextOnly) {
+  const root = HTMLParser.parse(rawContent);
+  const mentionAndTagRegex = /([@#][\w_-]+)/g;
+  const result = keepTextOnly
+    ? root.textContent.replace(mentionAndTagRegex, "").trim()
+    : root.textContent;
+  return result;
+}
+
+function hasCommand(commandName) {
+  return queryCommandsArray.indexOf(commandName) > -1;
 }
 
 async function getQueryReplyStatus() {
@@ -259,7 +259,9 @@ async function getQueryReplyStatus() {
       await agent
         .get("/api/v1/statuses/" + queryReplyStatusId)
         .set("Authorization", mastodonToken)
-        .catch((err) => console.error("loc3" + err))
+        .catch((err) =>
+          console.error("getQueryReplyStatus() failed with error: " + err)
+        )
     ).text
   );
   console.log("-----getStatus-----\n" + JSON.stringify(sourceBody) + "\n");

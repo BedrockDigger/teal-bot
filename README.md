@@ -28,7 +28,7 @@ Teal Bot 的大多数技能都可以通过发布一则格式如下的嘟文来�
 
 ### 聊天
 
-和 Teal Bot 一起快乐聊天。 ~~目前使用青云客的[菲菲](https://api.qingyunke.com/)聊天机器人。为什么？因为不要钱。~~ 目前使用腾讯云 NLP 闲聊 API。`tencentcloud-sdk-nodejs` SDK 真的是好东西，手搓 request 的难受谁知道（
+和 Teal Bot 一起快乐聊天。Teal Bot 会对 `@teal` 的嘟文或是无内容的 `@teal` 的嘟文所回复的嘟文的内容进行回答。 ~~目前使用青云客的[菲菲](https://api.qingyunke.com/)聊天机器人。为什么？因为不要钱。~~ 目前使用腾讯云 NLP 闲聊 API。`tencentcloud-sdk-nodejs` SDK 真的是好东西，手搓 request 的难受谁知道（
 
 **使用示例**
 
@@ -84,7 +84,7 @@ Teal Bot 的大多数技能都可以通过发布一则格式如下的嘟文来�
 
 ### #ttrans
 
-翻译调用`#ttrans`技能的嘟文所回复的那则嘟文。翻译的目标语言默认为中文。
+翻译调用`#ttrans`技能的嘟文的内容或其所回复的那则嘟文的内容。翻译的目标语言默认为中文。
 
 **使用示例**
 
@@ -162,7 +162,7 @@ Teal Bot 的大多数技能都可以通过发布一则格式如下的嘟文来�
 
 4. 安装依赖。
 
-   ```bash\
+   ```bash
    $ npm i
    ```
 

@@ -233,12 +233,20 @@ async function postSlicedStatus(message, doReply, doReplySelf) {
   for (let i = 0; i < message.length; i += 450) {
     await postStatus(
       message.substring(i, i + 450) +
-        ` (${Math.floor(i / 450) + 1}/${sliceSum})`,
+      ` (${Math.floor(i / 450) + 1}/${sliceSum})`,
       doReply,
       doReplySelf
     );
   }
 }
+
+// function findSingleParenthesis(string) {
+//   let left
+//   for (let i = 0; i < queryStatusContent.length; i++) {
+//     const charl = queryStatusContent.charAt(i)
+//     if()parenthesisArray.push(charl)
+//   }
+// }
 
 function stripContent(rawContent, keepTextOnly) {
   const root = HTMLParser.parse(rawContent);

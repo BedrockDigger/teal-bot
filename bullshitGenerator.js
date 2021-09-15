@@ -1,5 +1,5 @@
 function bullshitGenerator(theme) {
-  let 主题 = theme
+  let 主题 = theme;
 
   let 论述 = [
     "现在，解决主题的问题，是非常非常重要的。 所以， ",
@@ -30,7 +30,7 @@ function bullshitGenerator(theme) {
     "总结的来说， ",
     "既然如何， ",
     "经过上述讨论",
-  ]
+  ];
 
   let 名人名言 = [
     "伏尔泰曾经说过，不经巨大的困难，不会有伟大的事业。这不禁令我深思",
@@ -133,7 +133,7 @@ function bullshitGenerator(theme) {
     "史美尔斯曾经说过，书籍把我们引入最美好的社会，使我们认识各个时代的伟大智者。这不禁令我深思",
     "冯学峰曾经说过，当一个人用工作去迎接光明，光明很快就会来照耀着他。这不禁令我深思",
     "吉格·金克拉曾经说过，如果你能做梦，你就能实现它。这不禁令我深思",
-  ]
+  ];
 
   let 后面垫话 = [
     "这不禁令我深思。 ",
@@ -141,12 +141,9 @@ function bullshitGenerator(theme) {
     "这启发了我， ",
     "我希望诸位也能好好地体会这句话。 ",
     "这句话语虽然很短，但令我浮想联翩。 ",
-  ]
+  ];
 
-  let 前面垫话 = [
-    "曾经说过",
-    "在不经意间这样说过",
-  ]
+  let 前面垫话 = ["曾经说过", "在不经意间这样说过"];
 
   function 随便取一句(列表) {
     let 坐标 = Math.floor(Math.random() * 列表.length);
@@ -159,10 +156,10 @@ function bullshitGenerator(theme) {
   }
 
   function 来点名人名言() {
-    let 名言 = 随便取一句(名人名言)
-    名言 = 名言.replace("曾经说过", 随便取一句(前面垫话))
-    名言 = 名言.replace("这不禁令我深思", 随便取一句(后面垫话))
-    return 名言
+    let 名言 = 随便取一句(名人名言);
+    名言 = 名言.replace("曾经说过", 随便取一句(前面垫话));
+    名言 = 名言.replace("这不禁令我深思", 随便取一句(后面垫话));
+    return 名言;
   }
 
   function 来点论述() {
@@ -173,13 +170,13 @@ function bullshitGenerator(theme) {
 
   function 增加段落(章节) {
     if (章节[章节.length - 1] === " ") {
-      章节 = 章节.slice(0, -2)
+      章节 = 章节.slice(0, -2);
     }
-    return "　　" + 章节 + "。 "
+    return "　　" + 章节 + "。 ";
   }
 
   function 生成文章() {
-    let 文章 = []
+    let 文章 = [];
     for (let 空 in 主题) {
       let 章节 = "";
       let 章节长度 = 0;
@@ -205,7 +202,7 @@ function bullshitGenerator(theme) {
     return 文章.join("\n");
   }
 
-  return 生成文章()
+  return 生成文章();
 }
 
-module.exports = bullshitGenerator
+module.exports = bullshitGenerator;

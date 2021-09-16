@@ -111,8 +111,14 @@ async function commandEcho() {
   const message = "刚才你对我说：\n" + queryStatusContent;
   postStatus(message, true, false);
 }
-
 async function commandChat() {
+  if (hasSingleParenthesis(queryStatusContent)) {
+    await postStatus(
+      "）○(￣□￣○)\nAn unmatched left parenthesis creates an unresolved tension that will stay with you all day.",
+      true,
+      false
+    );
+  }
   const NlpClient = tencentcloud.nlp.v20190408.Client;
   const clientConfig = {
     credential: {

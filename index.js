@@ -8,10 +8,8 @@ const bullshitGenerator = require("./bullshitGenerator");
 // env vars
 agent.use(prefix(process.env.MASTODON_DOMAIN));
 const mastodonToken = process.env.MASTODON_ACCESS_TOKEN;
-const baiduTranslateAppid = process.env.BAIDU_TRANSLATE_APPID;
-const baiduTranslateKey = process.env.BAIDU_TRANSLATE_KEY;
-const tencentChatbotSecretId = process.env.TENCENT_CHATBOT_SECRETID;
-const tencentChatbotSecretKey = process.env.TENCENT_CHATBOT_SECRETKEY;
+const tencentCloudApiSecretId = process.env.TENCENT_CLOUD_API_SECRETID;
+const tencentCloudApiSecretKey = process.env.TENCENT_CLOUD_API_SECRETID;
 
 // global vars - my little "Redux store"
 let queryId = ""; // aka the ID of the notification object: we'll be calling the object "query"
@@ -31,32 +29,19 @@ const commands = ["thelp", "techo", "ttrans", "tshit"];
 const languages = [
   "zh",
   "en",
-  "yue",
-  "wyw",
-  "jp",
-  "kor",
-  "fra",
-  "spa",
-  "th",
-  "ara",
+  "ja",
+  "ko",
+  "fr",
+  "es",
+  "it",
+  "de",
+  "tr",
   "ru",
   "pt",
-  "de",
-  "it",
-  "el",
-  "nl",
-  "pl",
-  "bul",
-  "est",
-  "dan",
-  "fin",
-  "cs",
-  "rom",
-  "slo",
-  "swe",
-  "hu",
-  "cht",
-  "vie",
+  "vi",
+  "id",
+  "th",
+  "ms",
 ];
 
 function mainLoop() {
@@ -131,8 +116,8 @@ async function commandChat() {
   const NlpClient = tencentcloud.nlp.v20190408.Client;
   const clientConfig = {
     credential: {
-      secretId: tencentChatbotSecretId,
-      secretKey: tencentChatbotSecretKey,
+      secretId: tencentCloudApiSecretId,
+      secretKey: tencentCloudApiSecretKey,
     },
     region: "ap-guangzhou",
     profile: {
@@ -164,8 +149,8 @@ async function commandTranslate(lang) {
   const TmtClient = tencentcloud.tmt.v20180321.Client;
   const clientConfig = {
     credential: {
-      secretId: tencentChatbotSecretId,
-      secretKey: tencentChatbotSecretKey,
+      secretId: tencentCloudApiSecretId,
+      secretKey: tencentCloudApiSecretKey,
     },
     region: "ap-hongkong",
     profile: {
@@ -181,8 +166,7 @@ async function commandTranslate(lang) {
     Target: lang ? lang : "zh",
     ProjectId: 0,
   };
-  const translatedObject = await client.TextTranslate(params)
-  console.log(translatedObject)
+  const translatedObject = await client.TextTranslate(params);
   const targetString = translatedObject.TargetText;
   await postStatus("腾讯云机器翻译说，上面那段话的意思是：\n", true, false);
   await postSlicedStatus(targetString, false, true);
@@ -234,13 +218,23 @@ async function postSlicedStatus(message, doReply, doReplySelf) {
   }
 }
 
-// function findSingleParenthesis(string) {
-//   let left
-//   for (let i = 0; i < queryStatusContent.length; i++) {
-//     const charl = queryStatusContent.charAt(i)
-//     if()parenthesisArray.push(charl)
-//   }
-// }
+function hasSingleParenthesis(string) {
+  let fullWidthCounter = 0,
+    halfWidthCounter = 0;
+  for (let i = string.length - 1; i > -1; i--) {
+    const charl = string.charAt(i);
+    if (charl === "(") {
+      halfWidthCounter += 1;
+    } else if (charl === "（") {
+      fullWidthCounter += 1;
+    } else if (charl === ")") {
+      halfWidthCounter -= 1;
+    } else if (charl === "）") {
+      fullWidthCounter -= 1;
+    }
+  }
+  return fullWidthCounter > 0 || halfWidthCounter > 0;
+}
 
 function stripContent(rawContent, keepTextOnly) {
   const root = HTMLParser.parse(rawContent);

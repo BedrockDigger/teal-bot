@@ -102,7 +102,7 @@ function mainLoop() {
       currentQueryId = queryId;
     })
     .catch((err) => console.error("mainLoop() failed with error: " + err));
-  setTimeout(mainLoop, 2000);
+  setTimeout(mainLoop, 5000);
 }
 
 // command functions
@@ -277,4 +277,4 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (realMax - realMin) + realMin);
 }
 
-setTimeout(mainLoop, 2000);
+setTimeout(mainLoop, 5000);

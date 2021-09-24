@@ -198,7 +198,7 @@ async function commandHelp() {
   const message =
     "我是 @estel_de_hikari 写的 bot。我的名字来自他喜欢的一个颜色。我可以当复读机、会在28种语言之间进行互译，还会陪你聊天。\
 你可以在 https://github.com/BedrockDigger/teal-bot/blob/master/README.md 了解和我愉快玩耍的具体方法。\n\
-我在不过300行的 JavaScript 里，等你回家哦。 :blobcat:";
+我在300行的 JavaScript 里，等你回家哦。 :blobcat:";
   postStatus(message, true, false);
 }
 
@@ -295,7 +295,7 @@ async function getMentionPrefix() {
   let mentions,
     mentionPrefix = "";
   const originalTooter = queryObject.account.acct;
-  if (queryStatusContent) {
+  if (queryStatusContent || hasCommand('thelp')) {
     mentions = queryObject.status.mentions
       .map((userObject) => userObject.acct)
       .filter((acct) => acct !== "teal");

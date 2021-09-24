@@ -4,6 +4,8 @@
 
 Teal Bot 是 @estel_de_hikari@erica.moe 的还在开发中的的目前不知道作用是什么的机器人。
 
+什么？数据库？Teal 的核心是 setTimeout() 轮询 /doge～
+
 ## 用法
 
 Teal Bot 的大多数技能都可以通过发布一则格式如下的嘟文来召唤：
@@ -53,20 +55,8 @@ Teal Bot 的大多数技能都可以通过发布一则格式如下的嘟文来�
 **示例回复**
 
 ```
-我是 @estel_de_hikari 的还在开发中的的目前不知道作用是什么的机器人。
-
-用法：
-我的所有技能都可以通过发布一则格式如下的嘟文来召唤：
-@teal #技能 内容
-为了不污染标签环境，所有技能的名字都有个额外的字母“t”作开头。
-其中 #技能 目前可以是：
-
-#thelp: 显示本则帮助
-#techo: 回显你发给我的嘟文
-#tchat: 和我一起快乐聊天（目前使用青云客的菲菲人工智障）
-#ttrans: 翻译指定嘟文（目前使用百度翻译）
-
-关于每个技能的详细用法，请参考 https://github.com/BedrockDigger/teal-bot/main/README.md
+@estel_de_hikari 我是 @estel_de_hikari 写的 bot。我的名字来自他喜欢的一个颜色。我可以当复读机、会在28种语言之间进行互译，还会陪你聊天。你可以在 https://github.com/BedrockDigger/teal-bot/blob/master/README.md 了解和我愉快玩耍的具体方法。
+我在300行的 JavaScript 里，等你回家哦。 :blobcat:
 ```
 
 ### #techo

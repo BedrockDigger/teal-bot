@@ -113,8 +113,14 @@ async function commandEcho() {
   postStatus(message, true, false);
 }
 async function commandChat() {
-  await setupMetaReply();
-  if (hasSingleParenthesis(queryStatusContent)) {
+  let originalText;
+  if (queryStatusContent) {
+    originalText = queryStatusContent;
+  } else {
+    await setupMetaReply();
+    originalText = queryReplyStatusContent;
+  }
+  if (hasSingleParenthesis(originalText)) {
     await postStatus(
       "）○(￣□￣○)\nAn unmatched left parenthesis creates an unresolved tension that will stay with you all day.",
       true,
@@ -136,9 +142,8 @@ async function commandChat() {
   };
   const client = new NlpClient(clientConfig);
   const params = {
-    Query: queryStatusContent ? queryStatusContent : queryReplyStatusContent,
+    Query: originalText,
   };
-  console.log(params.Query);
   client.ChatBot(params).then(
     (data) => {
       postStatus(data.Reply, true, false);
@@ -150,10 +155,13 @@ async function commandChat() {
 }
 
 async function commandTranslate(lang) {
-  await setupMetaReply();
-  const originalText = queryStatusContent
-    ? queryStatusContent
-    : queryReplyStatusContent;
+  let originalText;
+  if (queryStatusContent) {
+    originalText = queryStatusContent;
+  } else {
+    await setupMetaReply();
+    originalText = queryReplyStatusContent;
+  }
   const TmtClient = tencentcloud.tmt.v20180321.Client;
   const clientConfig = {
     credential: {

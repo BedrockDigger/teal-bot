@@ -13,10 +13,11 @@ const tencentCloudApiSecretKey = process.env.TENCENT_CLOUD_API_SECRETKEY;
 
 // global vars - my little "Redux store"
 let queryId = ""; // aka the ID of the notification object: we'll be calling the object "query"
+let queryObject;
 let currentQueryId = "";
 let queryStatusId = "";
 let queryStatusContent = ""; // stripped by value assignment
-let queryUsername = "";
+let queryReplyStatusContent = "";
 let queryReplyStatusId = ""; // optional
 let selfStatusId = ""; // aka the ID of the last posted thing
 let queryTagsArray = []; // mandatory, but can be empty
@@ -51,7 +52,7 @@ function mainLoop() {
     .set("Content-Type", "multipart/form-data")
     .field("limit", "1")
     .then((res) => {
-      const queryObject = JSON.parse(res.text)[0];
+      queryObject = JSON.parse(res.text)[0];
       queryId = queryObject.id;
       if (queryId !== currentQueryId) {
         queryUsername = queryObject.account.username;
@@ -112,6 +113,7 @@ async function commandEcho() {
   postStatus(message, true, false);
 }
 async function commandChat() {
+  await setupMetaReply();
   if (hasSingleParenthesis(queryStatusContent)) {
     await postStatus(
       "）○(￣□￣○)\nAn unmatched left parenthesis creates an unresolved tension that will stay with you all day.",
@@ -134,10 +136,9 @@ async function commandChat() {
   };
   const client = new NlpClient(clientConfig);
   const params = {
-    Query: queryStatusContent
-      ? queryStatusContent
-      : await getQueryReplyStatus(),
+    Query: queryStatusContent ? queryStatusContent : queryReplyStatusContent,
   };
+  console.log(params.Query);
   client.ChatBot(params).then(
     (data) => {
       postStatus(data.Reply, true, false);
@@ -149,9 +150,10 @@ async function commandChat() {
 }
 
 async function commandTranslate(lang) {
+  await setupMetaReply();
   const originalText = queryStatusContent
     ? queryStatusContent
-    : await getQueryReplyStatus();
+    : queryReplyStatusContent;
   const TmtClient = tencentcloud.tmt.v20180321.Client;
   const clientConfig = {
     credential: {
@@ -195,7 +197,7 @@ async function commandHelp() {
 // utility functions
 
 async function postStatus(message, doReply, doReplySelf) {
-  const content = "@" + queryUsername + " " + message;
+  const content = (await getMentionPrefix()) + message;
   await agent
     .post("/api/v1/statuses")
     .set("Authorization", mastodonToken)
@@ -255,26 +257,52 @@ function hasCommand(commandName) {
   return queryCommandsArray.indexOf(commandName) > -1;
 }
 
-async function getQueryReplyStatus() {
+async function setupMetaReply() {
+  queryReplyStatusId = queryObject.status.in_reply_to_id;
+  queryReplyStatusContent = stripContent(
+    (await getQueryReplyStatusObject()).content,
+    true
+  );
+}
+
+async function getQueryReplyStatusObject() {
   const sourceBody = JSON.parse(
     (
       await agent
         .get("/api/v1/statuses/" + queryReplyStatusId)
         .set("Authorization", mastodonToken)
         .catch((err) =>
-          console.error("getQueryReplyStatus() failed with error: " + err)
+          console.error(
+            "getQueryReplyStatusObject().content failed with error: " + err
+          )
         )
     ).text
   );
   console.log("-----getStatus-----\n" + JSON.stringify(sourceBody) + "\n");
-  const content = stripContent(sourceBody.content, true);
-  return content;
+  return sourceBody;
 }
 
-function getRandomInt(min, max) {
-  const realMin = Math.ceil(min);
-  const realMax = Math.floor(max);
-  return Math.floor(Math.random() * (realMax - realMin) + realMin);
+// has a trailing space
+async function getMentionPrefix() {
+  let mentions,
+    mentionPrefix = "";
+  const originalTooter = queryObject.account.acct;
+  if (queryStatusContent) {
+    mentions = queryObject.status.mentions
+      .map((userObject) => userObject.acct)
+      .filter((acct) => acct !== "teal");
+    mentions.unshift(originalTooter);
+  } else {
+    mentions = [
+      originalTooter,
+      (await getQueryReplyStatusObject()).account.acct,
+    ];
+  }
+  mentions = [...new Set(mentions)];
+  for (acct of mentions) {
+    mentionPrefix += "@" + acct + " ";
+  }
+  return mentionPrefix;
 }
 
-setTimeout(mainLoop, 5000);
+mainLoop(5000);

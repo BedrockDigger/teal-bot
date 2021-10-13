@@ -8,9 +8,6 @@ const bullshitGenerator = require("./bullshitGenerator");
 // env vars
 agent.use(prefix(process.env.MASTODON_DOMAIN));
 const mastodonToken = process.env.MASTODON_ACCESS_TOKEN;
-const tencentCloudApiSecretId = process.env?.TENCENT_CLOUD_API_SECRETID;
-const tencentCloudApiSecretKey = process.env?.TENCENT_CLOUD_API_SECRETKEY;
-const deeplAuthenticationKey = process.env?.DEEPL_AUTHENTICATION_KEY;
 const translationApi = process.env.TRANSLATION_API;
 
 // global vars - my little "Redux store"
@@ -335,8 +332,8 @@ async function tencentTranslate(lang, originalText) {
   const TmtClient = tencentcloud.tmt.v20180321.Client;
   const clientConfig = {
     credential: {
-      secretId: tencentCloudApiSecretId,
-      secretKey: tencentCloudApiSecretKey,
+      secretId: process.env.TENCENT_CLOUD_API_SECRETID,
+      secretKey: process.env.TENCENT_CLOUD_API_SECRETKEY,
     },
     region: "ap-hongkong",
     profile: {
@@ -362,7 +359,7 @@ async function deeplTranslate(lang, originalText) {
     (
       await agent
         .post("api-free.deepl.com/v2/translate")
-        .set("DeepL-Auth-Key", deeplAuthenticationKey)
+        .set("DeepL-Auth-Key", process.env.DEEPL_AUTHENTICATION_KEY)
         .query({ text: originalText })
         .query({ target_lang: lang ? lang : "zh" })
     ).text

@@ -10,6 +10,7 @@ agent.use(prefix(process.env.MASTODON_DOMAIN));
 const mastodonToken = process.env.MASTODON_ACCESS_TOKEN;
 const tencentCloudApiSecretId = process.env.TENCENT_CLOUD_API_SECRETID;
 const tencentCloudApiSecretKey = process.env.TENCENT_CLOUD_API_SECRETKEY;
+const catApiKey = process.env.CAT_API_KEY;
 
 // global vars - my little "Redux store"
 let queryId = ""; // aka the ID of the notification object: we'll be calling the object "query"

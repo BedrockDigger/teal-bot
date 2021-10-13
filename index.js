@@ -100,18 +100,21 @@ function mainLoop() {
           } else if (hasCommand("thelp")) {
             commandHelp();
           } else if (hasCommand("ttrans")) {
-            const querylanguageArray = queryTagsArray.filter((language) =>
+            const queryLanguageArray = queryTagsArray.filter((language) =>
               languages.includes(language)
             );
-            if (querylanguageArray.length > 1) {
+            const predictedLang = queryLanguageArray[0];
+            if (queryLanguageArray.length > 1) {
               postStatus(
                 "目标语言 tag 的数量貌似有点多诶 :blobmiou:",
                 true,
                 false
               );
+            } else if (!languages.includes(predictedLang) && predictedLang) {
+              postStatus("这种语言我还不会 :blobmiou:", true, false);
             } else {
               queryReplyStatusId = queryObject.status.in_reply_to_id;
-              commandTranslate(queryCommandsArray[0]);
+              commandTranslate(predictedLang);
             }
           } else if (hasCommand("tshit")) {
             commandShit();
@@ -150,7 +153,8 @@ async function commandChat() {
   }
   if (hasSingleParenthesis(originalText)) {
     await postStatus(
-      "）○(￣□￣○)\nAn unmatched left parenthesis creates an unresolved tension that will stay with you all day.",
+      "）○(￣□￣○)\n\
+An unmatched left parenthesis creates an unresolved tension that will stay with you all day.",
       true,
       false
     );

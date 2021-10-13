@@ -103,12 +103,14 @@ function mainLoop() {
             const querylanguageArray = queryTagsArray.filter((language) =>
               languages.includes(language)
             );
-            if (querylanguageArray.length !== 1) {
+            if (querylanguageArray.length > 1) {
               postStatus(
-                "目标语言 tag 的数量貌似有错诶 :blobmiou:",
+                "目标语言 tag 的数量貌似有点多诶 :blobmiou:",
                 true,
                 false
               );
+            } else if (!languages.includes(queryCommandsArray[0])) {
+              postStatus("这种语言我还不会 :blobmiou:", true, false);
             } else {
               queryReplyStatusId = queryObject.status.in_reply_to_id;
               console.log(querylanguageArray);

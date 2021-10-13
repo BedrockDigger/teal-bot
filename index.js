@@ -8,8 +8,10 @@ const bullshitGenerator = require("./bullshitGenerator");
 // env vars
 agent.use(prefix(process.env.MASTODON_DOMAIN));
 const mastodonToken = process.env.MASTODON_ACCESS_TOKEN;
-const tencentCloudApiSecretId = process.env.TENCENT_CLOUD_API_SECRETID;
-const tencentCloudApiSecretKey = process.env.TENCENT_CLOUD_API_SECRETKEY;
+const tencentCloudApiSecretId = process.env?.TENCENT_CLOUD_API_SECRETID;
+const tencentCloudApiSecretKey = process.env?.TENCENT_CLOUD_API_SECRETKEY;
+const deeplAuthenticationKey = process.env?.DEEPL_AUTHENTICATION_KEY;
+const translationApi = process.env.TRANSLATION_API;
 
 // global vars - my little "Redux store"
 let queryId = ""; // aka the ID of the notification object: we'll be calling the object "query"
@@ -27,23 +29,57 @@ let queryCommandsArray = [];
 const commands = ["thelp", "techo", "ttrans", "tshit"];
 
 // translate target language abbrs
-const languages = [
-  "zh",
-  "en",
-  "ja",
-  "ko",
-  "fr",
-  "es",
-  "it",
-  "de",
-  "tr",
-  "ru",
-  "pt",
-  "vi",
-  "id",
-  "th",
-  "ms",
-];
+let languages;
+if (translationApi === "TENCENT") {
+  languages = [
+    "zh",
+    "en",
+    "ja",
+    "ko",
+    "fr",
+    "es",
+    "it",
+    "de",
+    "tr",
+    "ru",
+    "pt",
+    "vi",
+    "id",
+    "th",
+    "ms",
+  ];
+} else if (translationApi === "DEEPL") {
+  languages = [
+    "BG",
+    "CS",
+    "DA",
+    "DE",
+    "EL",
+    "EN-GB",
+    "EN-US",
+    "EN",
+    "ES",
+    "ET",
+    "FI",
+    "FR",
+    "HU",
+    "IT",
+    "JA",
+    "LT",
+    "LV",
+    "NL",
+    "PL",
+    "PT-PT",
+    "PT-BR",
+    "PT",
+    "RO",
+    "RU",
+    "SK",
+    "SL",
+    "SV",
+    "ZH",
+  ];
+}
 
 function mainLoop() {
   agent
@@ -155,37 +191,19 @@ async function commandChat() {
 }
 
 async function commandTranslate(lang) {
-  let originalText;
+  let originalText, targetText;
   if (queryStatusContent) {
     originalText = queryStatusContent;
   } else {
     await setupMetaReply();
     originalText = queryReplyStatusContent;
   }
-  const TmtClient = tencentcloud.tmt.v20180321.Client;
-  const clientConfig = {
-    credential: {
-      secretId: tencentCloudApiSecretId,
-      secretKey: tencentCloudApiSecretKey,
-    },
-    region: "ap-hongkong",
-    profile: {
-      httpProfile: {
-        endpoint: "tmt.tencentcloudapi.com",
-      },
-    },
-  };
-  const client = new TmtClient(clientConfig);
-  const params = {
-    SourceText: originalText,
-    Source: "auto",
-    Target: lang ? lang : "zh",
-    ProjectId: 0,
-  };
-  const translatedObject = await client.TextTranslate(params);
-  const targetString = translatedObject.TargetText;
-  await postStatus("腾讯云机器翻译说，上面那段话的意思是：\n", true, false);
-  await postSlicedStatus(targetString, false, true);
+  if (translationApi === "TENCENT") {
+    targetText = await tencentTranslate(lang, originalText);
+  } else if (translationApi === "DEEPL") {
+    targetText = await deeplTranslate(lang, originalText);
+  }
+  await postSlicedStatus(targetText, false, true);
 }
 
 async function commandShit() {
@@ -196,7 +214,7 @@ async function commandShit() {
 
 async function commandHelp() {
   const message =
-    "我是 @estel_de_hikari 写的 bot。我的名字来自他喜欢的一个颜色。我可以当复读机、会在28种语言之间进行互译，还会陪你聊天。\
+    "我是 @estel_de_hikari 写的 bot。我的名字来自他喜欢的一个颜色。我可以当复读机、会在24种语言之间进行互译，还会陪你聊天。\
 你可以在 https://github.com/BedrockDigger/teal-bot/blob/master/README.md 了解和我愉快玩耍的具体方法。\n\
 我在300行的 JavaScript 里，等你回家哦。 :blobcat:";
   postStatus(message, true, false);
@@ -295,7 +313,7 @@ async function getMentionPrefix() {
   let mentions,
     mentionPrefix = "";
   const originalTooter = queryObject.account.acct;
-  if (queryStatusContent || hasCommand('thelp')) {
+  if (queryStatusContent || hasCommand("thelp")) {
     mentions = queryObject.status.mentions
       .map((userObject) => userObject.acct)
       .filter((acct) => acct !== "teal");
@@ -311,6 +329,46 @@ async function getMentionPrefix() {
     mentionPrefix += "@" + acct + " ";
   }
   return mentionPrefix;
+}
+
+async function tencentTranslate(lang, originalText) {
+  const TmtClient = tencentcloud.tmt.v20180321.Client;
+  const clientConfig = {
+    credential: {
+      secretId: tencentCloudApiSecretId,
+      secretKey: tencentCloudApiSecretKey,
+    },
+    region: "ap-hongkong",
+    profile: {
+      httpProfile: {
+        endpoint: "tmt.tencentcloudapi.com",
+      },
+    },
+  };
+  const client = new TmtClient(clientConfig);
+  const params = {
+    SourceText: originalText,
+    Source: "auto",
+    Target: lang ? lang : "zh",
+    ProjectId: 0,
+  };
+  const translatedObject = await client.TextTranslate(params);
+  await postStatus("腾讯云机器翻译说，上面那段话的意思是：", true, false);
+  return translatedObject.TargetText;
+}
+
+async function deeplTranslate(lang, originalText) {
+  const translatedObject = JSON.parse(
+    (
+      await agent
+        .post("api-free.deepl.com/v2/translate")
+        .set("DeepL-Auth-Key", deeplAuthenticationKey)
+        .query({ text: originalText })
+        .query({ target_lang: lang ? lang : "zh" })
+    ).text
+  );
+  await postStatus("DeepL 翻译说，上面那段话的意思是：", true, false);
+  return translatedObject.translations[0].text;
 }
 
 mainLoop(5000);

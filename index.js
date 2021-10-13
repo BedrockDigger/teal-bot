@@ -47,37 +47,32 @@ if (translationApi === "TENCENT") {
   ];
 } else if (translationApi === "DEEPL") {
   languages = [
-    "BG",
-    "CS",
-    "DA",
-    "DE",
-    "EL",
-    "EN-GB",
-    "EN-US",
-    "EN",
-    "ES",
-    "ET",
-    "FI",
-    "FR",
-    "HU",
-    "IT",
-    "JA",
-    "LT",
-    "LV",
-    "NL",
-    "PL",
-    "PT-PT",
-    "PT-BR",
-    "PT",
-    "RO",
-    "RU",
-    "SK",
-    "SL",
-    "SV",
-    "ZH",
+    "bg",
+    "cs",
+    "da",
+    "de",
+    "el",
+    "en",
+    "es",
+    "et",
+    "fi",
+    "fr",
+    "hu",
+    "it",
+    "ja",
+    "lt",
+    "lv",
+    "nl",
+    "pl",
+    "pt",
+    "ro",
+    "ru",
+    "sk",
+    "sl",
+    "sv",
+    "zh",
   ];
 }
-
 function mainLoop() {
   agent
     .get("/api/v1/notifications")
@@ -108,14 +103,15 @@ function mainLoop() {
             const querylanguageArray = queryTagsArray.filter((language) =>
               languages.includes(language)
             );
-            if (querylanguageArray.length > 1) {
+            if (querylanguageArray.length !== 1) {
               postStatus(
-                "我比较傻，一次只能翻译成一种语言 :blobmiou:",
+                "目标语言 tag 的数量貌似有错诶 :blobmiou:",
                 true,
                 false
               );
             } else {
               queryReplyStatusId = queryObject.status.in_reply_to_id;
+              console.log(querylanguageArray);
               commandTranslate(querylanguageArray[0]);
             }
           } else if (hasCommand("tshit")) {
@@ -355,6 +351,7 @@ async function tencentTranslate(lang, originalText) {
 }
 
 async function deeplTranslate(lang, originalText) {
+  console.log(lang);
   const translatedObject = JSON.parse(
     (
       await agent

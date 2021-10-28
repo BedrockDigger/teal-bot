@@ -3,7 +3,7 @@ const agent = require("superagent-use")(require("superagent"));
 const prefix = require("superagent-prefix");
 require("dotenv").config();
 const tencentcloud = require("tencentcloud-sdk-nodejs");
-const bullshitGenerator = require("./bullshitGenerator");
+const bullshitGenerator = require("./bullshit/generator");
 
 // env vars
 agent.use(prefix(process.env.MASTODON_DOMAIN));
@@ -162,8 +162,8 @@ An unmatched left parenthesis creates an unresolved tension that will stay with 
   const NlpClient = tencentcloud.nlp.v20190408.Client;
   const clientConfig = {
     credential: {
-      secretId: tencentCloudApiSecretId,
-      secretKey: tencentCloudApiSecretKey,
+      secretId: process.env.TENCENT_CLOUD_API_SECRETID,
+      secretKey: process.env.TENCENT_CLOUD_API_SECRETKEY,
     },
     region: "ap-guangzhou",
     profile: {

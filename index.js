@@ -1,3 +1,5 @@
+//  Ai! laurië lantar lassi súrinen,
+//  yéni únótimë ve rámar aldaron!
 const HTMLParser = require("node-html-parser");
 const agent = require("superagent-use")(require("superagent"));
 const prefix = require("superagent-prefix");
@@ -9,6 +11,7 @@ const bullshitGenerator = require("./bullshit/generator");
 agent.use(prefix(process.env.MASTODON_DOMAIN));
 const mastodonToken = process.env.MASTODON_ACCESS_TOKEN;
 const translationApi = process.env.TRANSLATION_API;
+const catApiKey = process.env.CAT_API_KEY;
 
 // global vars - my little "Redux store"
 let queryId = ""; // aka the ID of the notification object: we'll be calling the object "query"
@@ -202,6 +205,23 @@ async function commandTranslate(lang) {
   await postSlicedStatus(targetText, false, true);
 }
 
+async function commandCat(){
+  while (true) {
+    const catResponseArray = JSON.parse(
+      (
+        await agent
+          .get("https://api.thecatapi.com/v1/images/search")
+          .set("x-api-key", catApiKey)
+      ).text
+    );
+    if (catResponseArray[0].breeds.length > 0) {
+      console.log(catResponseArray[0]);
+      break;
+    }
+  }
+  
+}
+
 async function commandShit() {
   const bullshit = bullshitGenerator(queryStatusContent);
   await postStatus("你要的狗屁不通文章生成啦：\n", true, false);
@@ -280,7 +300,7 @@ function hasCommand(commandName) {
 }
 
 async function setupMetaReply() {
-  queryReplyStatusId = queryObject.status.in_reply_to_id;
+  queryReplyStatusId = queryObject.status?.in_reply_to_id;
   queryReplyStatusContent = stripContent(
     (await getQueryReplyStatusObject()).content,
     true

@@ -4,7 +4,7 @@
 
 Teal Bot 是 @estel_de_hikari@erica.moe 的还在开发中的的目前不知道作用是什么的机器人。
 
-什么？数据库？Teal 的核心是 setTimeout() 轮询 /doge ～
+什么？数据库？Teal 的核心是 `setTimeout()` 轮询 /doge ～
 
 ## 用法
 

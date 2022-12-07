@@ -193,7 +193,7 @@ An unmatched left parenthesis creates an unresolved tension that will stay with 
   // );
   const chatGptClient = new ChatGPTAPI({
     sessionToken: process.env.CHATGPT_SESSION_TOKEN,
-    markdown: false,
+    markdown: true,
   });
 
   await chatGptClient.ensureAuth();

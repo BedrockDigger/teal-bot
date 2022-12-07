@@ -4,7 +4,7 @@
 
 Teal Bot 是 @estel_de_hikari@erica.moe 的还在开发中的的目前不知道作用是什么的机器人。
 
-什么？数据库？Teal 的核心是 setTimeout() 轮询 /doge ～
+什么？数据库？Teal 的核心是 `setTimeout()` 轮询 /doge ～
 
 ## 用法
 
@@ -20,7 +20,7 @@ Teal Bot 的大多数技能都可以通过发布一则格式如下的嘟文来�
 
 `#techo`: 回显你发给 Teal Bot 的嘟文
 
-`#ttrans`: 翻译指定嘟文（目前使用百度翻译）
+`#ttrans`: 翻译指定嘟文（目前可用 DeepL 翻译或腾讯云机器翻译）
 
 `#tshit`：众所周知的狗屁不通生成器。
 

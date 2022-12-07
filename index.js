@@ -199,7 +199,7 @@ An unmatched left parenthesis creates an unresolved tension that will stay with 
   await chatGptClient.ensureAuth();
 
   chatGptClient.sendMessage(originalText).then((answerString) => {
-    postStatus(
+    postSlicedStatus(
       answerString +
         "\n\nTeal is now backed by ChatGPT (https://openai.com/blog/chatgpt/)!",
       true,
@@ -259,6 +259,7 @@ async function commandHelp() {
 
 async function postStatus(message, doReply, doReplySelf) {
   const content = (await getMentionPrefix()) + message;
+
   await agent
     .post("/api/v1/statuses")
     .set("Authorization", mastodonToken)
@@ -276,6 +277,10 @@ async function postStatus(message, doReply, doReplySelf) {
 }
 
 async function postSlicedStatus(message, doReply, doReplySelf) {
+  if (message.length < 450) {
+    await postStatus(message, doReply, doReplySelf);
+    return;
+  }
   const sliceSum = Math.ceil(message.length / 450);
   for (let i = 0; i < message.length; i += 450) {
     await postStatus(

@@ -205,22 +205,22 @@ async function commandTranslate(lang) {
   await postSlicedStatus(targetText, false, true);
 }
 
-async function commandCat(){
-  while (true) {
-    const catResponseArray = JSON.parse(
-      (
-        await agent
-          .get("https://api.thecatapi.com/v1/images/search")
-          .set("x-api-key", catApiKey)
-      ).text
-    );
-    if (catResponseArray[0].breeds.length > 0) {
-      console.log(catResponseArray[0]);
-      break;
-    }
-  }
+// async function commandCat(){
+//   while (true) {
+//     const catResponseArray = JSON.parse(
+//       (
+//         await agent
+//           .get("https://api.thecatapi.com/v1/images/search")
+//           .set("x-api-key", catApiKey)
+//       ).text
+//     );
+//     if (catResponseArray[0].breeds.length > 0) {
+//       console.log(catResponseArray[0]);
+//       break;
+//     }
+//   }
   
-}
+// }
 
 async function commandShit() {
   const bullshit = bullshitGenerator(queryStatusContent);

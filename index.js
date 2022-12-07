@@ -1,11 +1,16 @@
 //  Ai! laurië lantar lassi súrinen,
 //  yéni únótimë ve rámar aldaron!
-const HTMLParser = require("node-html-parser");
-const agent = require("superagent-use")(require("superagent"));
-const prefix = require("superagent-prefix");
-require("dotenv").config();
-const tencentcloud = require("tencentcloud-sdk-nodejs");
-const bullshitGenerator = require("./bullshit/generator");
+import HTMLParser from "node-html-parser";
+// const HTMLParser = require("node-html-parser");
+import suUse from "superagent-use";
+import su from "superagent";
+const agent = suUse(su);
+import prefix from "superagent-prefix";
+import dotenv from "dotenv";
+dotenv.config();
+import tencentcloud from "tencentcloud-sdk-nodejs";
+import { ChatGPTAPI } from "chatgpt";
+import bullshitGenerator from "./bullshit/generator.js";
 
 // env vars
 agent.use(prefix(process.env.MASTODON_DOMAIN));
@@ -86,7 +91,6 @@ function mainLoop() {
       queryObject = JSON.parse(res.text)[0];
       queryId = queryObject.id;
       if (queryId !== currentQueryId) {
-        queryUsername = queryObject.account.username;
         if (queryObject.type === "mention") {
           queryStatusId = queryObject.status.id;
           queryStatusContent = stripContent(queryObject.status.content, true);
@@ -162,31 +166,46 @@ An unmatched left parenthesis creates an unresolved tension that will stay with 
       false
     );
   }
-  const NlpClient = tencentcloud.nlp.v20190408.Client;
-  const clientConfig = {
-    credential: {
-      secretId: process.env.TENCENT_CLOUD_API_SECRETID,
-      secretKey: process.env.TENCENT_CLOUD_API_SECRETKEY,
-    },
-    region: "ap-guangzhou",
-    profile: {
-      httpProfile: {
-        endpoint: "nlp.tencentcloudapi.com",
-      },
-    },
-  };
-  const client = new NlpClient(clientConfig);
-  const params = {
-    Query: originalText,
-  };
-  client.ChatBot(params).then(
-    (data) => {
-      postStatus(data.Reply, true, false);
-    },
-    (err) => {
-      console.error("commandChat() failed with error: " + err);
-    }
-  );
+  // const NlpClient = tencentcloud.nlp.v20190408.Client;
+  // const clientConfig = {
+  //   credential: {
+  //     secretId: process.env.TENCENT_CLOUD_API_SECRETID,
+  //     secretKey: process.env.TENCENT_CLOUD_API_SECRETKEY,
+  //   },
+  //   region: "ap-guangzhou",
+  //   profile: {
+  //     httpProfile: {
+  //       endpoint: "nlp.tencentcloudapi.com",
+  //     },
+  //   },
+  // };
+  // const client = new NlpClient(clientConfig);
+  // const params = {
+  //   Query: originalText,
+  // };
+  // client.ChatBot(params).then(
+  // (data) => {
+  //   postStatus(data.Reply, true, false);
+  // },
+  // (err) => {
+  //   console.error("commandChat() failed with error: " + err);
+  // }
+  // );
+  const chatGptClient = new ChatGPTAPI({
+    sessionToken: process.env.CHATGPT_SESSION_TOKEN,
+    markdown: false,
+  });
+
+  await chatGptClient.ensureAuth();
+
+  chatGptClient.sendMessage(originalText).then((answerString) => {
+    postStatus(
+      answerString +
+        "\n\nTeal is now backed by ChatGPT (https://openai.com/blog/chatgpt/)!",
+      true,
+      false
+    );
+  });
 }
 
 async function commandTranslate(lang) {
@@ -219,7 +238,7 @@ async function commandTranslate(lang) {
 //       break;
 //     }
 //   }
-  
+
 // }
 
 async function commandShit() {
@@ -341,7 +360,7 @@ async function getMentionPrefix() {
     ];
   }
   mentions = [...new Set(mentions)];
-  for (acct of mentions) {
+  for (let acct of mentions) {
     mentionPrefix += "@" + acct + " ";
   }
   return mentionPrefix;

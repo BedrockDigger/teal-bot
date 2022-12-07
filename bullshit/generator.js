@@ -1,4 +1,4 @@
-function bullshitGenerator(theme) {
+export default function bullshitGenerator(theme) {
   let 主题 = theme;
 
   let 论述 = [
@@ -204,5 +204,3 @@ function bullshitGenerator(theme) {
 
   return 生成文章();
 }
-
-module.exports = bullshitGenerator;

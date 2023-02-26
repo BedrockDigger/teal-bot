@@ -296,14 +296,14 @@ function hasSingleParenthesis(string) {
   let fullWidthCounter = 0,
     halfWidthCounter = 0;
   for (let i = string.length - 1; i > -1; i--) {
-    const charl = string.charAt(i);
-    if (charl === "(") {
+    const character = string.charAt(i);
+    if (character === "(") {
       halfWidthCounter += 1;
-    } else if (charl === "（") {
+    } else if (character === "（") {
       fullWidthCounter += 1;
-    } else if (charl === ")") {
+    } else if (character === ")") {
       halfWidthCounter -= 1;
-    } else if (charl === "）") {
+    } else if (character === "）") {
       fullWidthCounter -= 1;
     }
   }
